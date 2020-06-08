@@ -28,11 +28,12 @@ module.exports = (options) => {
 		/* Below push related user context data is obtained using the "securityUtils.mfpAuth" filter in the app.get request and 
 		sent to the analytics server. Hence the push parameters are passed to the "mf-security" module and push scope is sent to the 
 		filter as a parameter. */
-		
-			var userContext = JSON.stringify(req.securityContext);
-			userContext = userContext.replace('mfp-application', 'mfpapplication'); //This is done to avoid json accessing errors
-			userContext = userContext.replace('mfp-device', 'mfpdevice'); 
-			userContext = JSON.parse(userContext);
+
+		var userContext = JSON.stringify(req.securityContext);
+		userContext = userContext.replace('mfp-application', 'mfpapplication'); //This is done to avoid json accessing errors
+		userContext = userContext.replace('mfp-device', 'mfpdevice'); 
+		userContext = userContext.replace('mfp-user', 'mfpuser');
+		userContext = JSON.parse(userContext);
 			
 			var datetime = new Date();
 			var customLogInputs = {
@@ -53,10 +54,14 @@ module.exports = (options) => {
 				"deviceOSversion": "9.2.1"
 			};
 			
-			mf.analytics.sendCustomLogs(customLogInputs);
+		mf.analytics.sendCustomLogs(customLogInputs);
 
-			res.send("Order placed!");
-		});
+		mf.push.sendNotificationByUsers(messageText, [userContext.mfpuser.id] );
+		
+		mf.push.sendNotificationByDeviceIds(messageText, [userContext.mfpdevice.id]);
+
+		res.send("Order placed!");
+	});
 	
 	
 	/*

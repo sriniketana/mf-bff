@@ -17,6 +17,8 @@ Push notification is the ability of a mobile device to receive messages that are
 - sendNotification
 - sendNotificationByTags
 - sendNotificationByPlatform
+- sendNotificationByDeviceId
+- sendNotificationByUserId
 
 #Live Update
 The Live Update feature in Mobile Foundation provides a simple way to define and serve different configurations for users of an application. It includes a component in the MobileFirst Operations Console for defining the structure of the configuration as well as the values of the configuration. 
@@ -37,39 +39,58 @@ To keep your user engagement relevant and effective you must obtain insights int
 - sendNetworkTransactions
 
 
+##User Context
+
+Additionally user context is made available to the end developer with the help of the passport strategy(read more about it at <https://www.npmjs.com/package/passport-mfp-token-validation>).
+
+This can be used by adding a filter "mf.securityUtils.mfpAuth(scope)" in the created endpoint. Here the parameter `scope` determines the user context data that is fetched. An example of this is provided in the default `app.js`.
+
+The input for the passport filter is made available through the environment variables using the key "passport_filter" in the `appsody run` command
+
+
 ##Getting Started
-1. Create a new folder in your local directory and initialize it using the Appsody CLI, e.g.:
+1. Add the repo to your appsody repo list by giving it an appropriate name(like mobile) by using the yaml file like below :
+
+    ```bash
+    appsody repo add mobile https://github.com/MobileFirst-Platform-Developer-Center/stacks/releases/download/latest/mobile-index.yaml 
+    ```
+2. Create a new folder in your local directory and initialize it using the Appsody CLI, e.g.:
 
     ```bash
     mkdir mf-project
     cd mf-project
-    appsody init nodejs-mobile-foundation
+    appsody init mobile/nodejs-mobile-foundation
     ```
 
     This will initialize a Node.js Mobile Foundation project using the default "simple" template. 
     
-1. After your project has been initialized you can then run your application using the following command:
+3. After your project has been initialized you can then run your application using the following command:
 
     ```bash
-    appsody run --docker-options "--env MF_ENVVARS={\"push\":{\"mf_url\":\"<MFSERVER>\",\"mf_app_id\":\"<APPID>\",\"username\":\"<UNAME>\",\"password\":\"<PWD>\"},\"liveupdate\":{\"mf_url\":\"<MFSERVER>\",\"mf_app_id\":\"<APPID>\",\"username\":\"<UNAME>\",\"password\":\"<PWD>\"},\"analytics\":{\"mf_url\":\"<MFSERVER>\",\"mf_app_name\":\"<APPNAME>\",\"username\":\"<UNAME>\",\"password\":\"<PWD>\"}}""
+    appsody run --docker-options "--env MF_ENVVARS={\"push\":{\"mf_url\":\"<MFSERVER>\",\"mf_app_id\":\"<APPID>\",\"username\":\"<UNAME>\",\"password\":\"<PWD>\"},\"liveupdate\":{\"mf_url\":\"<MFSERVER>\",\"mf_app_id\":\"<APPID>\",\"username\":\"<UNAME>\",\"password\":\"<PWD>\"},\"analytics\":{\"mf_url\":\"<MFSERVER>\",\"mf_app_name\":\"<APPNAME>\",\"username\":\"<UNAME>\",\"password\":\"<PWD>\"},\"passport_filter\":{\"mf_url\":\"<MFSERVER>\",\"username\":\"<UNAME>\",\"password\":\"<PWD>\"}}"
     ```
 Each of the placeholder is explained below :
-	*	\<MFSERVER>    
+	
+	* \<MFSERVER>    
 	`The Mobile Foundation server URL. Example :"https://1.2.3.4:5678" (Note the complete server address including the port is necesssary)`
 	* \<APPID>    
 	`The application's app ID. Example : "com.ibm.mf"`
-	* \<UNAME>	
+	* \<UNAME>
 	`The confidential client username. Example : "test"`
-	* \<PASSWORD>		
+	* \<PASSWORD>
 		`The confidential client' password. Example : "test"`
-	* \<APPNAME>		
+	* \<APPNAME>
 	 	`The application's name. Example : "IBM MF App"`
 
+Alternatively you can provide individual environment variables when all your services are pointing to a single Mobile Foundation server and a single application like below :
 
-    This launches a Docker container that continuously re-builds and re-runs your project, exposing it on port 3000.
+  ```bash
+    appsody run --docker-options "-e mf_url=<MFSERVER> -e mf_app_id=<APPID> -e push_mf_username=<PUSH_UNAME> -e push_mf_password=<PUSH_PWD> -e liveupdate_mf_username=<LIVEUPDATE_UNAME> -e liveupdate_mf_password=<LIVEUPDATE_PWD> -e analytics_mf_username=<ANALYICS_UNAME> -e analytics_mf_password=<ANALYTICS_PWD> -e pf_mf_username=<PASSPORT_FILTER_UNAME> -e pf_mf_password=<PASSPORT_FILTER_PWD>"
+  ```
 
-    You can continue to edit the application in your preferred IDE (VSCode or others) and your changes will be reflected in the running container within a few seconds.
+This launches a Docker container that continuously re-builds and re-runs your project, exposing it on port 3000.
 
+You can continue to edit the application in your preferred IDE (VSCode or others) and your changes will be reflected in the running container within a few seconds.
 
 #API Reference
 
@@ -102,6 +123,30 @@ Each of the placeholder is explained below :
                        'messageOptions' : json (Various settings can be sent in a valid json)
     Output           : returns          : promise => on success resolves with the schema
                                                   on error, rejects with the error
+
+
+                                             
+    sendNotificationByDeviceIds 
+
+    Description      : Sends a push notification to all registered of specified deviceids devices with the provided message.
+    Input paramaters : 'messageText'    : string (ex. "Hi from Mobile First!")
+                       'deviceids'      : array of strings (ex. ["93eu8erj"])
+                       'messageOptions' : json (Various settings can be sent in a valid json)
+    Output           : returns          : promise => on success resolves with the schema
+                                                  on error, rejects with the error
+                                                  
+   
+   
+    sendNotificationByUsers 
+
+    Description      : Sends a push notification to all registered devices of specified userids with the provided message.
+    Input paramaters : 'messageText'    : string (ex. "Hi from Mobile First!")
+                       'userids'      : array of strings (ex. ["Nancy"])
+                       'messageOptions' : json (Various settings can be sent in a valid json)
+    Output           : returns          : promise => on success resolves with the schema
+                                                  on error, rejects with the error
+                                                  
+                                                  
 
 ##Live Update
     isFeatureEnabled      
