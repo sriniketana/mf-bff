@@ -63,6 +63,9 @@ module.exports = (options) => {
 		res.send("Order placed!");
 	});
 	
+	var port = process.env.PORT || 8080;
+	app.listen(port);
+	console.log('Node.js web server at port 7000 is running..');
 	
 	/*
 	app.get('/analytics/networktransactions', (req, res) => {
