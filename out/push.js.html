@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: push.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: push.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** 
+ * @module Push Notification API
+ */
+module.exports = function(params) {
+  
+  var push = {};
+  
+  var securityUtils = require('./mf-security.js');
+  var axios = require('axios');
+  
+  //Initializing required MF property values
+  const mf_url = params.mf_url;
+  const appId = params.mf_app_id;
+  const username = params.username;
+  const password = params.password;
+  
+  var scopes = 'messages.write push.application.' + appId;
+  
+
+  /**
+   * sendNotification      
+
+    Description      : Sends a push notification to all registered devices with the provided message.
+    Input paramaters : 'messageText'    : string (ex. "Hi from Mobile First!")
+                       'messageOptions' : json (Various settings can be sent in a valid json)
+    Output           : returns          : promise => on success resolves with the schema
+                                                  on error, rejects with the error
+  */
+  exports.sendNotification = async function(messageText, messageOptions) {
+    
+    var token = await securityUtils.getAccessToken(scopes, mf_url, username, password);
+    var config = {
+      method: 'post',
+      url: mf_url + "/imfpush/v1/apps/" + appId + "/messages",
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        "message": {
+          "alert": messageText
+        },
+        "settings": messageOptions
+      }
+    };
+    
+    return new Promise((resolve, reject) => {
+      axios(config)
+        .then(function(response) {
+          if(response.status == 202) {
+            resolve("Push notification sent successfully");
+          } else {
+            reject("Push notification sending failed with error");
+          }
+          
+        })
+        .catch(function(error) {
+          reject(error);
+        });
+    });
+  }
+
+
+
+  /***********************************************************************************************
+    sendNotificationByTags     
+
+    Description      : Sends a push notification to all registered devices with specified tags with the provided message.
+    Input paramaters : 'messageText'    : string (ex. "Hi from Mobile First!")
+                       'tags'           : array of strings (ex. ["tag1","tag2"])
+                       'messageOptions' : json (Various settings can be sent in a valid json)
+    Output           : returns          : promise => on success resolves with the schema
+                                                  on error, rejects with the error
+  ***********************************************************************************************/
+  push.sendNotificationByTags = async function(messageText, tags, messageOptions) {
+    
+    var token = await securityUtils.getAccessToken(scopes, mf_url, username, password);
+    var config = {
+      method: 'post',
+      url: mf_url + "/imfpush/v1/apps/" + appId + "/messages",
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        "message": {
+          "alert": messageText
+        },
+        "settings": messageOptions,
+        "target": {
+          "tagNames": tags
+        }
+      }
+    };
+    
+    return new Promise((resolve, reject) => {
+      axios(config)
+        .then(function(response) {
+          if(response.status == 202) {
+            resolve("Push notification by tags sent successfully");
+          } else {
+            reject("Push notification sending by tags failed with error");
+          }
+          
+        })
+        .catch(function(error) {
+          reject(error);
+        });
+    });
+  }
+
+
+  /***********************************************************************************************
+    sendNotificationByPlatforms 
+
+    Description      : Sends a push notification to all registered devices of specified platforms with the provided message.
+    Input paramaters : 'messageText'    : string (ex. "Hi from Mobile First!")
+                       'platforms'      : array of strings (ex. ["A,G"])
+                       'messageOptions' : json (Various settings can be sent in a valid json)
+    Output           : returns          : promise => on success resolves with the schema
+                                                  on error, rejects with the error
+  ***********************************************************************************************/
+  
+  push.sendNotificationByPlatforms = async function(messageText, platforms, messageOptions) {
+    
+    var token = await securityUtils.getAccessToken(scopes, mf_url, username, password);
+    var config = {
+      method: 'post',
+      url: mf_url + "/imfpush/v1/apps/" + appId + "/messages",
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        "message": {
+          "alert": messageText
+        },
+        "settings": messageOptions,
+        "target": {
+          "platforms": platforms
+        }
+      }
+    };
+    
+    return new Promise((resolve, reject) => {
+      axios(config)
+        .then(function(response) {
+          if(response.status == 202) {
+            resolve("Push notification by platform sent successfully");
+          } else {
+            reject("Push notification sending by platform failed with error");
+          }
+          
+        })
+        .catch(function(error) {
+          reject(error);
+        });
+    });
+  } 
+  return push;
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Push%2520Notification%2520API.html">Push Notification API</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sun May 10 2020 09:59:24 GMT+0530 (India Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
